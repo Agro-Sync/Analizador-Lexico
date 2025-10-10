@@ -27,7 +27,7 @@ jobs:
 
       - name: Run AWS scraping script
         run: |
-          python -U .github/workflows/get_aws_access.py
+          python -u .github/workflows/get_aws_access.py
         env:
           EMAIL: ${{ env.EMAIL }}
           PASSWORD: ${{ env.PASSWORD }}
