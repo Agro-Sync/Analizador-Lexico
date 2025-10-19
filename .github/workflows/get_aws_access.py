@@ -1,5 +1,5 @@
 from playwright.sync_api import sync_playwright
-import time, os, logging
+import time, logging
 
 logging.basicConfig(level=logging.INFO)
 
@@ -12,6 +12,7 @@ class AWS:
             timezone_id='America/New_York',
         )
         self.page = self.context.new_page()
+        self.screenshots = "screenshots"
 
         logging.info("[+] Navegador iniciado")
         self._login(email, password)
@@ -23,18 +24,22 @@ class AWS:
 
         self.page.locator('body > div.splash-body > a:nth-child(1) > button').wait_for(state='visible', timeout=15000)
         self.page.click('body > div.splash-body > a:nth-child(1) > button')
-        self.page.screenshot(path="screenshots/click_start.png")
+        self.page.screenshot(path=f"{self.screenshots}/click_start.png")
 
-        self.page.locator("#pseudonym_session_unique_id").wait_for(state='visible', timeout=15000)
         self.page.fill("#pseudonym_session_unique_id", email)
-        self.page.locator("#pseudonym_session_password").wait_for(state='visible', timeout=15000)
         self.page.fill("#pseudonym_session_password", password)
-        self.page.screenshot(path="screenshots/send_data.png")
+        self.page.screenshot(path=f"{self.screenshots}/send_data.png")
 
         self.page.click('#login_form > div.ic-Login__actions > div.ic-Form-control.ic-Form-control--login > input')
-        self.page.screenshot(path="screenshots/conclude_login.png")
 
-        logging.info("[+] Login concluído com sucesso")
+        try:
+            self.page.wait_for_url("https://awsacademy.instructure.com/?login_success=1", timeout=15000)
+            logging.info("[+] Login concluído com sucesso")
+            self.page.screenshot(path=f"{self.screenshots}/conclude_login.png")
+        except:
+            logging.error("[!] Falha no login: credenciais inválidas ou página não carregou corretamente")
+            self.page.screenshot(path=f"{self.screenshots}/login_error.png")
+            raise Exception("Login falhou! Verifique suas credenciais ou se o site mudou o layout.")
 
 
     def configure_aws(self, conta):
@@ -42,12 +47,14 @@ class AWS:
         logging.info("[+] Entrando na AWS")
         self.page.goto(f"https://awsacademy.instructure.com/courses/{conta}/modules/items/12498015")
         self.page.wait_for_load_state("domcontentloaded", timeout=0)
+        self.page.screenshot(path=f"{self.screenshots}/configure_aws.png")
 
         logging.info('[*] Verificando status da conta')
         frame_locator = self.page.frame_locator('iframe.tool_launch')
         locator = frame_locator.locator('#vmstatus')
         locator.wait_for(state='attached', timeout=30000)
         classe = locator.get_attribute('class')
+        self.page.screenshot(path=f"{self.screenshots}/configure_aws_status.png")
 
         if 'led-green' not in classe:
             logging.info('[*] Inicia a conta da AWS')
@@ -58,6 +65,7 @@ class AWS:
         # mostrar informações aws
         frame_locator.locator('#detailbtn2').click()
         frame_locator.locator('#clikeyboxbtn').click()
+        self.page.screenshot(path=f"{self.screenshots}/show_aws_credentials.png")
 
         # coletar texto
         text_locator = frame_locator.locator('#clikeybox > pre > span')
@@ -86,6 +94,7 @@ if __name__ == "__main__":
 
     email = os.environ["EMAIL"]
     senha = os.environ["PASSWORD"]
+    print(email, senha)
     conta = "130670"
 
     aws = AWS(email, senha)
@@ -98,7 +107,7 @@ if __name__ == "__main__":
         screenshot_dir = "screenshots"
         os.makedirs(screenshot_dir, exist_ok=True)
         timestamp = int(time.time())
-        path = os.path.join(screenshot_dir, f"screenshot_{timestamp}.png")
+        path = os.path.join(screenshot_dir, f"screenshot_error_{timestamp}.png")
         page.screenshot(path=path)
         logging.info(f"Screenshot salvo em: {path}")
         raise Exception(error)
