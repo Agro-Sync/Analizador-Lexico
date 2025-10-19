@@ -71,6 +71,10 @@ jobs:
     name: Validar credenciais AWS
     runs-on: ubuntu-latest
     needs: configurar-credenciais
+    outputs:
+      AWS_ACCESS_KEY_ID: ${{ steps.export.outputs.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ steps.export.outputs.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ steps.export.outputs.AWS_SESSION_TOKEN }}
 
     steps:
       - name: Instalar AWS CLI
@@ -90,10 +94,11 @@ jobs:
           AWS_SESSION_TOKEN: ${{ needs.configurar-credenciais.outputs.AWS_SESSION_TOKEN }}
 
       - name: Export AWS creds for next job
+        id: export
         run: |
-          echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
-          echo "AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}" >> $GITHUB_ENV
+          echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> $GITHUB_OUTPUT
+          echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_OUTPUT
+          echo "AWS_SESSION_TOKEN=$(echo -n "$AWS_SESSION_TOKEN" | base64 -w 0)" >> $GITHUB_OUTPUT
         env:
           AWS_ACCESS_KEY_ID: ${{ needs.configurar-credenciais.outputs.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ needs.configurar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}
@@ -107,6 +112,12 @@ jobs:
     steps:
       - name: Checkout do repositório
         uses: actions/checkout@v3
+
+      - name: Decodificar credenciais
+        run: |
+          echo "AWS_ACCESS_KEY_ID=${{ needs.validar-credenciais.outputs.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ needs.validar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=$(echo '${{ needs.validar-credenciais.outputs.AWS_SESSION_TOKEN }}' | base64 --decode)" >> $GITHUB_ENV
 
       - name: Enviar código para EC2 via SSM
         env:
