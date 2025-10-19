@@ -1,0 +1,13 @@
+[flake8]
+# Ignorar erros de espaçamento, formatação e estilo
+ignore = E1, E2, E3, E4, E5, W1, W2, W3, W5
+
+# Mostrar apenas erros sérios de sintaxe e lógica
+select = E9, F63, F7, F82
+
+# Limitar complexidade e comprimento de linha (opcional)
+max-complexity = 10
+max-line-length = 120
+
+# Ignorar algumas pastas
+exclude = .git, __pycache__, venv, .venv

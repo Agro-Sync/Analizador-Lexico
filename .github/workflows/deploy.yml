@@ -1,0 +1,127 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  validacao-codigo:
+    name: Validação de código
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+
+      - name: Rodar Flake8
+        run: |
+          echo "🚀 Rodando Flake8..."
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --max-complexity=10 --max-line-length=100 --statistics
+          
+
+  configurar-credenciais:
+    name: Configurar credenciais
+    runs-on: ubuntu-latest
+    outputs:
+      AWS_ACCESS_KEY_ID: ${{ steps.export.outputs.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ steps.export.outputs.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ steps.export.outputs.AWS_SESSION_TOKEN }}
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install depenencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          playwright install
+
+      - name: Run AWS scraping script
+        run: |
+          python -u .github/workflows/get_aws_access.py
+          
+          echo "AWS_ACCESS_KEY_ID=$(grep AWS_ACCESS_KEY_ID creds.txt | cut -d= -f2)" >> $GITHUB_OUTPUT
+          echo "AWS_SECRET_ACCESS_KEY=$(grep AWS_SECRET_ACCESS_KEY creds.txt | cut -d= -f2)" >> $GITHUB_OUTPUT
+          echo "AWS_SESSION_TOKEN=$(grep AWS_SESSION_TOKEN creds.txt | cut -d= -f2)" >> $GITHUB_OUTPUT
+        env:
+          EMAIL: ${{ env.EMAIL }}
+          PASSWORD: ${{ env.PASSWORD }}
+
+      - name: Use AWS credentials
+        run: |
+          aws s3 ls  # exemplo de comando usando as creds
+        env:
+          AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ env.AWS_SESSION_TOKEN }}
+
+  validar-credenciais:
+    name: Validar credenciais AWS
+    runs-on: ubuntu-latest
+    needs: configurar-credenciais
+
+    steps:
+      - name: Instalar AWS CLI
+        run: sudo apt-get install -y awscli
+
+      - name: Validar credenciais
+        run: |
+          echo "🔍 Validando credenciais AWS..."
+          aws sts get-caller-identity
+          aws s3 ls
+          echo "✅ Credenciais válidas!"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ needs.configurar-credenciais.outputs.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ needs.configurar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ needs.configurar-credenciais.outputs.AWS_SESSION_TOKEN }}
+
+  deploy-code-ec2:
+    name: Deploy do código no Jupyter EC2
+    runs-on: ubuntu-latest
+    needs: validar-credenciais
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: Instalar AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Enviar código para EC2 via SSM
+        env:
+          AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ env.AWS_SESSION_TOKEN }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          echo "📡 Enviando código do repositório para EC2..."
+            aws ssm send-command \
+              --instance-ids "i-0db5167ddabeb2f30" \
+              --document-name "AWS-RunShellScript" \
+              --comment "Atualizando código Jupyter" \
+              --parameters 'commands=[
+                "cd /opt/jupyter/notebook",
+                "echo 🚀 Removendo pasta antiga se existir...",
+                "rm -rf crawler",
+                "echo 📦 Clonando repositório...",
+                "git clone https://github.com/Agro-Sync/Analizador-Lexico.git temp_repo",
+                "mv temp_repo/src crawler",
+                "rm -rf temp_repo",
+                "chown -R ec2-user:ec2-user /opt/jupyter/notebook/crawler",
+                "echo ✅ Código atualizado com sucesso!"
+              ]' \
+              --region us-east-1
