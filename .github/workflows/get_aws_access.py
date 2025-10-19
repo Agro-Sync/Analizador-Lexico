@@ -76,7 +76,7 @@ if __name__ == "__main__":
     senha = os.environ["PASSWORD"]
     conta = "130670"
 
-    aws = AWS(email, senha, False)
+    aws = AWS(email, senha)
     info_raw = aws.configure_aws(conta)
     aws_access_key_id, aws_secret_access_key, aws_session_token = aws.get_secrets(info_raw)
     set_github_env(aws_access_key_id, aws_secret_access_key, aws_session_token)
