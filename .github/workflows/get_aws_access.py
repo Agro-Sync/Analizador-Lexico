@@ -1,4 +1,5 @@
 from playwright.sync_api import sync_playwright
+import time
 
 class AWS:
     def __init__(self, email, password, headless=True):
@@ -33,9 +34,14 @@ class AWS:
 
         print('[*] Verificando status da conta')
         frame_locator = self.page.frame_locator('iframe.tool_launch')
-        locator = frame_locator.locator('#vmstatus')
-        locator.wait_for(state='attached', timeout=0)
-        classe = locator.get_attribute('class')
+        try:
+            locator = frame_locator.locator('#vmstatus')
+            locator.wait_for(state='attached', timeout=30000)
+            classe = locator.get_attribute('class')
+        except Exception as e:
+            timestamp = int(time.time())
+            self.page.screenshot(path=f'screenshot_{timestamp}.png')
+            print(f"Erro encontrado: {e}")
 
         if 'led-green' not in classe:
             print('[*] Inicia a conta da AWS')
