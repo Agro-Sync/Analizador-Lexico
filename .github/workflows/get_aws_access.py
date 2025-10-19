@@ -22,7 +22,6 @@ class AWS:
         logging.info("[*] Fazendo login...")
         self.page.goto("https://www.awsacademy.com/vforcesite/LMS_Login")
 
-        self.page.locator('body > div.splash-body > a:nth-child(1) > button').wait_for(state='visible', timeout=15000)
         self.page.click('body > div.splash-body > a:nth-child(1) > button')
         self.page.screenshot(path=f"{self.screenshots}/click_start.png")
 
@@ -94,7 +93,7 @@ if __name__ == "__main__":
 
     email = os.environ["EMAIL"]
     senha = os.environ["PASSWORD"]
-    print(email, senha)
+    logging.info(f"{email} - {senha}")
     conta = "130670"
 
     aws = AWS(email, senha)
