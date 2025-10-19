@@ -120,6 +120,10 @@ jobs:
         run: |
           aws s3 cp ${{ steps.zip.outputs.zip_name }} s3://agrosync-bronze-jupyter/releases/${{ steps.zip.outputs.zip_name }}
           aws s3 cp ${{ steps.zip.outputs.zip_name }} s3://agrosync-bronze-jupyter/releases/latest.zip
+        env:
+          AWS_ACCESS_KEY_ID: ${{ needs.configurar-credenciais.outputs.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ needs.configurar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ needs.configurar-credenciais.outputs.AWS_SESSION_TOKEN }}
 
 # Depende de IAM Role para poder realizar o deploy diretamente na EC2
 #  deploy-code-ec2:
