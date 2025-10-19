@@ -34,7 +34,7 @@ class AWS:
             self.page.screenshot(path=f"{self.screenshots}/3-conclude_login.png")
         except:
             logging.error("[!] Falha no login: credenciais inválidas ou página não carregou corretamente")
-            self.page.screenshot(path=f"{self.screenshots}/4-login_error.png")
+            self.page.screenshot(path=f"{self.screenshots}/3-login_error.png")
             raise Exception("Login falhou! Verifique suas credenciais ou se o site mudou o layout.")
 
 
@@ -43,14 +43,14 @@ class AWS:
         logging.info("[+] Entrando na AWS")
         self.page.goto(f"https://awsacademy.instructure.com/courses/{conta}/modules/items/12498015")
         self.page.wait_for_load_state("domcontentloaded", timeout=0)
-        self.page.screenshot(path=f"{self.screenshots}/5-configure_aws.png")
+        self.page.screenshot(path=f"{self.screenshots}/4-configure_aws.png")
 
         logging.info('[*] Verificando status da conta')
         frame_locator = self.page.frame_locator('iframe.tool_launch')
         locator = frame_locator.locator('#vmstatus')
         locator.wait_for(state='attached', timeout=30000)
         classe = locator.get_attribute('class')
-        self.page.screenshot(path=f"{self.screenshots}/6-configure_aws_status.png")
+        self.page.screenshot(path=f"{self.screenshots}/5-configure_aws_status.png")
 
         if 'led-green' not in classe:
             logging.info('[*] Inicia a conta da AWS')
@@ -61,7 +61,7 @@ class AWS:
         # mostrar informações aws
         frame_locator.locator('#detailbtn2').click()
         frame_locator.locator('#clikeyboxbtn').click()
-        self.page.screenshot(path=f"{self.screenshots}/7-show_aws_credentials.png")
+        self.page.screenshot(path=f"{self.screenshots}/6-show_aws_credentials.png")
 
         # coletar texto
         text_locator = frame_locator.locator('#clikeybox > pre > span')
