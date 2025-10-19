@@ -7,10 +7,7 @@ class AWS:
     def __init__(self, email, password, headless=True):
         self.playwright = sync_playwright().start()
         self.browser = self.playwright.chromium.launch(headless=headless)
-        self.context = self.browser.new_context(
-            locale='en-US',
-            timezone_id='America/New_York',
-        )
+        self.context = self.browser.new_context()
         self.page = self.context.new_page()
         self.screenshots = "screenshots"
 
@@ -93,7 +90,6 @@ if __name__ == "__main__":
 
     email = os.environ["EMAIL"]
     senha = os.environ["PASSWORD"]
-    logging.info(f"{email} - {senha}")
     conta = "130670"
 
     aws = AWS(email, senha)

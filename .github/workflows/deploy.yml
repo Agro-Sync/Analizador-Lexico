@@ -57,8 +57,8 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=$(grep AWS_SECRET_ACCESS_KEY creds.txt | cut -d= -f2)" >> $GITHUB_OUTPUT
           echo "AWS_SESSION_TOKEN=$(grep AWS_SESSION_TOKEN creds.txt | cut -d= -f2)" >> $GITHUB_OUTPUT
         env:
-          EMAIL: ${{ env.EMAIL }}
-          PASSWORD: ${{ env.PASSWORD }}
+          EMAIL: ${{ secrets.EMAIL }}
+          PASSWORD: ${{ secrets.PASSWORD }}
 
       - name: Upload screenshots
         if: failure()
