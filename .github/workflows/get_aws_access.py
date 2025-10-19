@@ -25,10 +25,10 @@ class AWS:
         print("[+] Login concluído com sucesso")
 
 
-    def configure_aws(self):
+    def configure_aws(self, conta):
         """Configura a conta da AWS para consulta"""
         print("[+] Entrando na AWS")
-        self.page.goto("https://awsacademy.instructure.com/courses/130670/modules/items/12498015")
+        self.page.goto(f"https://awsacademy.instructure.com/courses/{conta}/modules/items/12498015")
         self.page.wait_for_load_state("domcontentloaded", timeout=0)
 
         print('[*] Verificando status da conta')
@@ -37,7 +37,7 @@ class AWS:
         locator.wait_for(state='attached', timeout=10000)
         classe = locator.get_attribute('class')
 
-        if not 'led-green' in classe:
+        if 'led-green' not in classe:
             print('[*] Inicia a conta da AWS')
             frame_locator.locator('#launchclabsbtn').click()
             frame_locator.locator('#vmstatus.led-green').wait_for(timeout=0)
@@ -59,7 +59,7 @@ class AWS:
 
         aws_access_key_id = info[1].split('=')[1]
         aws_secret_access_key = info[2].split('=')[1]
-        aws_session_token = info[3].split('=',1)[1]
+        aws_session_token = info[3].split('=', 1)[1]
         print('[+] Dados coletados')
         return aws_access_key_id, aws_secret_access_key, aws_session_token
 
@@ -75,8 +75,9 @@ if __name__ == "__main__":
 
     email = os.environ["EMAIL"]
     senha = os.environ["PASSWORD"]
+    conta = "130670"
 
     aws = AWS(email, senha)
-    info_raw = aws.configure_aws()
+    info_raw = aws.configure_aws(conta)
     aws_access_key_id, aws_secret_access_key, aws_session_token = aws.get_secrets(info_raw)
     set_github_env(aws_access_key_id, aws_secret_access_key, aws_session_token)
