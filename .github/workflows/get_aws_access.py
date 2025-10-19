@@ -21,9 +21,12 @@ class AWS:
         logging.info("[*] Fazendo login...")
         self.page.goto("https://www.awsacademy.com/vforcesite/LMS_Login")
 
+        self.page.locator('body > div.splash-body > a:nth-child(1) > button').wait_for(state='visible', timeout=15000)
         self.page.click('body > div.splash-body > a:nth-child(1) > button')
 
+        self.page.locator("#pseudonym_session_unique_id").wait_for(state='visible', timeout=15000)
         self.page.fill("#pseudonym_session_unique_id", email)
+        self.page.locator("#pseudonym_session_password").wait_for(state='visible', timeout=15000)
         self.page.fill("#pseudonym_session_password", password)
 
         self.page.click('#login_form > div.ic-Login__actions > div.ic-Form-control.ic-Form-control--login > input')
@@ -39,17 +42,9 @@ class AWS:
 
         logging.info('[*] Verificando status da conta')
         frame_locator = self.page.frame_locator('iframe.tool_launch')
-        try:
-            locator = frame_locator.locator('#vmstatus')
-            locator.wait_for(state='attached', timeout=30000)
-            classe = locator.get_attribute('class')
-        except Exception as e:
-            screenshot_dir = "screenshots"
-            os.makedirs(screenshot_dir, exist_ok=True)
-            timestamp = int(time.time())
-            path = os.path.join(screenshot_dir, f"screenshot_{timestamp}.png")
-            self.page.screenshot(path=path)
-            logging.info(f"Screenshot salvo em: {path}")
+        locator = frame_locator.locator('#vmstatus')
+        locator.wait_for(state='attached', timeout=30000)
+        classe = locator.get_attribute('class')
 
         if 'led-green' not in classe:
             logging.info('[*] Inicia a conta da AWS')
@@ -91,6 +86,16 @@ if __name__ == "__main__":
     conta = "130670"
 
     aws = AWS(email, senha)
-    info_raw = aws.configure_aws(conta)
-    aws_access_key_id, aws_secret_access_key, aws_session_token = aws.get_secrets(info_raw)
-    set_github_env(aws_access_key_id, aws_secret_access_key, aws_session_token)
+    page = aws.page
+    try:
+        info_raw = aws.configure_aws(conta)
+        aws_access_key_id, aws_secret_access_key, aws_session_token = aws.get_secrets(info_raw)
+        set_github_env(aws_access_key_id, aws_secret_access_key, aws_session_token)
+    except Exception as error:
+        screenshot_dir = "screenshots"
+        os.makedirs(screenshot_dir, exist_ok=True)
+        timestamp = int(time.time())
+        path = os.path.join(screenshot_dir, f"screenshot_{timestamp}.png")
+        page.screenshot(path=path)
+        logging.info(f"Screenshot salvo em: {path}")
+
