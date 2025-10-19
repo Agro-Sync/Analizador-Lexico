@@ -91,7 +91,7 @@ jobs:
 
   upload-to-s3:
     runs-on: ubuntu-latest
-
+    needs: validar-credenciais
     steps:
       - name: Checkout do código
         uses: actions/checkout@v3
