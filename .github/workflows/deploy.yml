@@ -71,6 +71,10 @@ jobs:
     name: Validar credenciais AWS
     runs-on: ubuntu-latest
     needs: configurar-credenciais
+    outputs:
+      AWS_ACCESS_KEY_ID: ${{ needs.configurar-credenciais.outputs.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ needs.configurar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ needs.configurar-credenciais.outputs.AWS_SESSION_TOKEN }}
 
     steps:
       - name: Instalar AWS CLI
@@ -100,9 +104,9 @@ jobs:
 
       - name: Enviar código para EC2 via SSM
         env:
-          AWS_ACCESS_KEY_ID: ${{ needs.configurar-credenciais.outputs.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ needs.configurar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ needs.configurar-credenciais.outputs.AWS_SESSION_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ needs.validar-credenciais.outputs.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ needs.validar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ needs.validar-credenciaiss.outputs.AWS_SESSION_TOKEN }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
           echo "📡 Enviando código do repositório para EC2..."
