@@ -23,13 +23,16 @@ class AWS:
 
         self.page.locator('body > div.splash-body > a:nth-child(1) > button').wait_for(state='visible', timeout=15000)
         self.page.click('body > div.splash-body > a:nth-child(1) > button')
+        self.page.screenshot(path="screenshots/click_start.png")
 
         self.page.locator("#pseudonym_session_unique_id").wait_for(state='visible', timeout=15000)
         self.page.fill("#pseudonym_session_unique_id", email)
         self.page.locator("#pseudonym_session_password").wait_for(state='visible', timeout=15000)
         self.page.fill("#pseudonym_session_password", password)
+        self.page.screenshot(path="screenshots/send_data.png")
 
         self.page.click('#login_form > div.ic-Login__actions > div.ic-Form-control.ic-Form-control--login > input')
+        self.page.screenshot(path="screenshots/conclude_login.png")
 
         logging.info("[+] Login concluído com sucesso")
 
@@ -98,4 +101,4 @@ if __name__ == "__main__":
         path = os.path.join(screenshot_dir, f"screenshot_{timestamp}.png")
         page.screenshot(path=path)
         logging.info(f"Screenshot salvo em: {path}")
-
+        raise Exception(error)
