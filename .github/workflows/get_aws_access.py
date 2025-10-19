@@ -7,7 +7,10 @@ class AWS:
     def __init__(self, email, password, headless=True):
         self.playwright = sync_playwright().start()
         self.browser = self.playwright.chromium.launch(headless=headless)
-        self.context = self.browser.new_context()
+        self.context = self.browser.new_context(
+            locale='en-US',
+            timezone_id='America/New_York',
+        )
         self.page = self.context.new_page()
 
         logging.info("[+] Navegador iniciado")
