@@ -63,7 +63,6 @@ class AWS:
         print('[+] Dados coletados')
         return aws_access_key_id, aws_secret_access_key, aws_session_token
 
-
 def set_github_env(aws_access_key_id, aws_secret_access_key, aws_session_token):
     with open(os.environ['GITHUB_ENV'], 'a') as env_file:
         env_file.write(f"AWS_ACCESS_KEY_ID={aws_access_key_id}\n")
