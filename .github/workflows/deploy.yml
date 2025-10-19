@@ -99,9 +99,9 @@ jobs:
       - name: Configurar credenciais AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          AWS_ACCESS_KEY_ID: ${{ needs.configurar-credenciais.outputs.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ needs.configurar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ needs.configurar-credenciais.outputs.AWS_SESSION_TOKEN }}
+          aws-access-key-id: ${{ needs.configurar-credenciais.outputs.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ needs.configurar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ needs.configurar-credenciais.outputs.AWS_SESSION_TOKEN }}
           aws-region: us-east-1
 
       - name: Instalar zip
