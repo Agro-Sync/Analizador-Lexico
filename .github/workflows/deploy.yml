@@ -106,23 +106,23 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ needs.validar-credenciais.outputs.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ needs.validar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ needs.validar-credenciaiss.outputs.AWS_SESSION_TOKEN }}
+          AWS_SESSION_TOKEN: ${{ needs.validar-credenciais.outputs.AWS_SESSION_TOKEN }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
           echo "📡 Enviando código do repositório para EC2..."
-            aws ssm send-command \
-              --instance-ids "i-0db5167ddabeb2f30" \
-              --document-name "AWS-RunShellScript" \
-              --comment "Atualizando código Jupyter" \
-              --parameters 'commands=[
-                "cd /opt/jupyter/notebook",
-                "echo 🚀 Removendo pasta antiga se existir...",
-                "rm -rf crawler",
-                "echo 📦 Clonando repositório...",
-                "git clone https://github.com/Agro-Sync/Analizador-Lexico.git temp_repo",
-                "mv temp_repo/src crawler",
-                "rm -rf temp_repo",
-                "chown -R ec2-user:ec2-user /opt/jupyter/notebook/crawler",
-                "echo ✅ Código atualizado com sucesso!"
-              ]' \
-              --region us-east-1
+          aws ssm send-command \
+            --instance-ids "i-0db5167ddabeb2f30" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Atualizando código Jupyter" \
+            --parameters 'commands=[
+              "cd /opt/jupyter/notebook",
+              "echo 🚀 Removendo pasta antiga se existir...",
+              "rm -rf crawler",
+              "echo 📦 Clonando repositório...",
+              "git clone https://github.com/Agro-Sync/Analizador-Lexico.git temp_repo",
+              "mv temp_repo/src crawler",
+              "rm -rf temp_repo",
+              "chown -R ec2-user:ec2-user /opt/jupyter/notebook/crawler",
+              "echo ✅ Código atualizado com sucesso!"
+            ]' \
+            --region us-east-1
