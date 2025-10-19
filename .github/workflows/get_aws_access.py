@@ -34,7 +34,7 @@ class AWS:
         print('[*] Verificando status da conta')
         frame_locator = self.page.frame_locator('iframe.tool_launch')
         locator = frame_locator.locator('#vmstatus')
-        locator.wait_for(state='attached', timeout=10000)
+        locator.wait_for(state='attached', timeout=0)
         classe = locator.get_attribute('class')
 
         if 'led-green' not in classe:
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     senha = os.environ["PASSWORD"]
     conta = "130670"
 
-    aws = AWS(email, senha)
+    aws = AWS(email, senha, False)
     info_raw = aws.configure_aws(conta)
     aws_access_key_id, aws_secret_access_key, aws_session_token = aws.get_secrets(info_raw)
     set_github_env(aws_access_key_id, aws_secret_access_key, aws_session_token)
