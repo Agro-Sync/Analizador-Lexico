@@ -53,10 +53,10 @@ jobs:
         id: aws_scraping
         run: |
           python -u .github/workflows/get_aws_access.py
-          
-          echo "AWS_ACCESS_KEY_ID=$(grep AWS_ACCESS_KEY_ID creds.txt | cut -d= -f2)" >> $GITHUB_OUTPUT
-          echo "AWS_SECRET_ACCESS_KEY=$(grep AWS_SECRET_ACCESS_KEY creds.txt | cut -d= -f2)" >> $GITHUB_OUTPUT
-          echo "AWS_SESSION_TOKEN=$(grep AWS_SESSION_TOKEN creds.txt | cut -d= -f2)" >> $GITHUB_OUTPUT
+
+          echo "AWS_ACCESS_KEY_ID=$(grep AWS_ACCESS_KEY_ID creds.txt | cut -d= -f2 | tr -d '\r\n')" >> $GITHUB_OUTPUT
+          echo "AWS_SECRET_ACCESS_KEY=$(grep AWS_SECRET_ACCESS_KEY creds.txt | cut -d= -f2 | tr -d '\r\n')" >> $GITHUB_OUTPUT
+          echo "AWS_SESSION_TOKEN=$(grep AWS_SESSION_TOKEN creds.txt | cut -d= -f2 | tr -d '\r\n')" >> $GITHUB_OUTPUT
         env:
           EMAIL: ${{ secrets.EMAIL }}
           PASSWORD: ${{ secrets.PASSWORD }}
@@ -98,11 +98,6 @@ jobs:
 
       - name: Configurar credenciais AWS
         uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ needs.configurar-credenciais.outputs.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ needs.configurar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ needs.configurar-credenciais.outputs.AWS_SESSION_TOKEN }}
-          aws-region: us-east-1
 
       - name: Instalar zip
         run: sudo apt-get install -y zip
@@ -124,6 +119,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ needs.configurar-credenciais.outputs.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ needs.configurar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ needs.configurar-credenciais.outputs.AWS_SESSION_TOKEN }}
+          AWS_DEFAULT_REGION: us-east-1
 
 # Depende de IAM Role para poder realizar o deploy diretamente na EC2
 #  deploy-code-ec2:
