@@ -1,3 +1,5 @@
+from datetime import datetime
+
 dicionario_sentimentos = {
     "positivo": [
         "chuva", "regular", "ideal", "favorável", "úmido", "equilibrado",
@@ -129,9 +131,12 @@ def analisador_lexico_com_resumo(nome_arquivo):
     print(f'- Total de palavras desconhecidas: {total_desconhecidas}')
     print(f'- Total de palavras analisadas:   {total_palavras}\n')
 
+    data_formated = datetime.now().strftime('%Y-%m-%d')
+    id_analise = datetime.now().strftime('%Y%m%d%H%M%S')
+
     with open('analise.csv', 'w', encoding='utf-8') as arquivo:
-        arquivo.write('Positivas;Negativas;Neutras;Total\n')
-        arquivo.write(f'{total_positivas};{total_negativas};{total_neutras};{total_palavras}\n')
+        arquivo.write('ID;Data;Positivas;Negativas;Neutras;Total\n')
+        arquivo.write(f'{id_analise};{data_formated};{total_positivas};{total_negativas};{total_neutras};{total_palavras}\n')
 
     return linhas_positiva, linhas_negativa
 
