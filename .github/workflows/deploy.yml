@@ -75,7 +75,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: scraping
-          path: ../../src/scraping
+          path: src/scraping
 
 
   validar-credenciais:
