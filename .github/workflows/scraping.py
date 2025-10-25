@@ -7,7 +7,7 @@ SELECTOR = {
     "noticia": "body > main",
 }
 
-path = '../../src/scraping'
+path = 'src/scraping'
 os.makedirs(path, exist_ok=True)
 data_formated = datetime.now().strftime('%Y-%m-%d')
 ARQUIVO = os.path.join(path, f'raw_scraping_{data_formated}.txt')
