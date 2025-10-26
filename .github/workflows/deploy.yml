@@ -115,6 +115,12 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
+      - name: Baixar artefato de scraping
+        uses: actions/download-artifact@v4
+        with:
+          name: scraping
+          path: src/scraping
+
       - name: Instalar zip
         run: sudo apt-get install -y zip
 
