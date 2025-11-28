@@ -41,7 +41,7 @@ class AWS:
     def configure_aws(self, conta):
         """Configura a conta da AWS para consulta"""
         logging.info("[+] Entrando na AWS")
-        self.page.goto(f"https://awsacademy.instructure.com/courses/{conta}/modules/items/12498015")
+        self.page.goto(f"https://awsacademy.instructure.com/courses/{conta}/modules/items/12444706")
         self.page.wait_for_load_state("domcontentloaded", timeout=0)
         self.page.screenshot(path=f"{self.screenshots}/4-configure_aws.png")
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
     email = os.environ["EMAIL"]
     senha = os.environ["PASSWORD"]
-    conta = "130670"
+    conta = "130178"
 
     aws = AWS(email, senha)
     page = aws.page
