@@ -150,8 +150,8 @@ jobs:
 
       - name: Enviar versão para o S3
         run: |
-          aws s3 cp ${{ steps.zip.outputs.zip_name }} s3://agrosync-bronze-jupyter/releases/${{ steps.zip.outputs.zip_name }}
-          aws s3 cp ${{ steps.zip.outputs.zip_name }} s3://agrosync-bronze-jupyter/releases/latest.zip
+          aws s3 cp ${{ steps.zip.outputs.zip_name }} s3://agrosync-bronze-150087878415/releases/${{ steps.zip.outputs.zip_name }}
+          aws s3 cp ${{ steps.zip.outputs.zip_name }} s3://agrosync-bronze-150087878415/releases/latest.zip
         env:
           AWS_ACCESS_KEY_ID: ${{ needs.validar-credenciais.outputs.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ needs.validar-credenciais.outputs.AWS_SECRET_ACCESS_KEY }}
